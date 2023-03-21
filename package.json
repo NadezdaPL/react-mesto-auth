@@ -46,7 +46,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+ssh://github.com/NadezdaPL/react-mesto-auth.git"
+    "url": "git+ssh://git@github.com/NadezdaPL/react-mesto-auth.git"
   },
   "bugs": {
     "url": "https://github.com/NadezdaPL/react-mesto-auth/issues"
