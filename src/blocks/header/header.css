@@ -1,0 +1,33 @@
+.header {
+  max-width: 100%;
+  min-height: 74px;
+  border-bottom: 1px solid rgba(84, 84, 84, 0.7);
+  padding-left: 200px;
+  padding-right: 200px;
+  padding-top: 45px;
+}
+
+@media screen and (max-width: 984px) {
+  .header {
+    min-height: 69px;
+    padding-left: 100px;
+    padding-right: 100px;
+  }
+}
+  
+@media screen and (max-width: 568px) {
+  .header {
+    min-height: 60px;
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .header {
+    min-height: 56px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 28px;
+  }
+}

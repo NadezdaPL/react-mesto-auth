@@ -1,0 +1,14 @@
+.elements__container {
+  width: 100%;
+  max-width: 282px;
+  min-height: 361px;
+  background-color: #fff;
+  border-radius: 10px;
+  position: relative;
+}
+
+@media screen and (max-width: 568px) {
+  .elements__container {
+    max-height: 361px;
+  }
+}
