@@ -1,16 +1,17 @@
 import React from "react";
 import useForm from "../hooks/useForm";
-// import { useEffect } from "react";
+import { useEffect } from "react";
+
 
 function Login({ onLogin }) {
-  const { values, handleChange } = useForm({});
+  const { values, handleChange, reset } = useForm({});
 
   function handleSubmit(e) {
     e.preventDefault(); 
 
-    if (!values.email || !values.password) {
-        return;
-    }
+    // if (!values.email || !values.password) {
+    //     return;
+    // }
     onLogin(values)
 
     // onLogin({
@@ -19,19 +20,21 @@ function Login({ onLogin }) {
     // });
   }
 
-//   useEffect(() => {
-//     reset();
-//   }, [reset]);
+  useEffect(() => {
+    reset();
+  }, [reset]);
+
+
 
   return (
     <section className="auth">
       <h2 className="auth__title">Вход</h2>
-      <form className="auth__form" onSubmit={handleSubmit}>
-        <fieldset className="auth__fieldset">
+      <form className="auth__form" onSubmit={handleSubmit} id="form__auth">
+        <div className="auth__fieldset">
           <input
             className="auth__input auth__input_type_email"
             name="email"
-            type="url"
+            type="email"
             required
             id="email"
             placeholder="Email"
@@ -43,8 +46,8 @@ function Login({ onLogin }) {
             id="email-error"
             className="popup__error popup__error_visible"
           ></span>
-        </fieldset>
-        <fieldset className="auth__fieldset">
+        </div>
+        <div className="auth__fieldset">
           <input
             className="auth__input auth__input_type_password"
             name="password"
@@ -60,9 +63,9 @@ function Login({ onLogin }) {
             id="password-error"
             className="popup__error popup__error_visible"
           ></span>
-        </fieldset>
+        </div>
       </form>
-      <button type="submit" className="auth__button">
+      <button type="submit" className="auth__button" form="form__auth">
         Войти
       </button>
     </section>

@@ -32,6 +32,6 @@
 
 **Ссылки:**
 
- **[Макет в Фигме](https://www.figma.com/file/bjyvbKKJN2naO0ucURl2Z0/JavaScript.-Sprint-5?node-id=0%3A1)**
  **[Макет в Фигме](https://www.figma.com/file/5H3gsn5lIGPwzBPby9jAOo/Sprint-14-RU?node-id=0%3A1)**
+
  **[Проект: Место](https://nadezdapl.github.io/react-mesto-auth/)**

@@ -8,7 +8,7 @@ import ImagePopup from "./ImagePopup";
 import Footer from "./Footer";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { api } from "../utils/api";
-import { auth } from "../utils/auth";
+import * as auth from "../utils/auth";
 import { Spinner } from "./Spinner";
 import { Route, useNavigate, Routes } from "react-router-dom";
 import Login from "./Login";
@@ -17,12 +17,12 @@ import InfoTooltip from "./InfoTooltip";
 import ProtectedRoute from "./ProtectedRoute";
 import { Navigate } from "react-router-dom";
 
-
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+  const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
   const [isinfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
   const [currentUser, setCurrentUser] = useState({});
@@ -31,7 +31,7 @@ function App() {
   const [isEditProfileChanging, setIsEditProfileChanging] = useState(false);
   const [isAddPlaceChanging, setIsAddPlaceChanging] = useState(false);
   const [isEditAvatarChanging, setIsEditAvatarChanging] = useState(false);
-  const [infoTooltipOpen, setInfoTooltipOpen] = useState("");
+  const [infoTooltipStatus, setInfoTooltipStatus] = useState(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
 
@@ -49,6 +49,8 @@ function App() {
           setIsCardsLoading(false);
         });
   }, [loggedIn]);
+
+
 
   const handleEditProfileClick = () => {
     setIsEditProfilePopupOpen(true);
@@ -149,31 +151,38 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
+    setIsImagePopupOpen(false);
     setSelectedCard(null);
-    setInfoTooltipOpen(false);
+    setIsInfoTooltipOpen(false);
   };
 
-  const authentication = useCallback((data) => {
-    if (!data) {
-      throw new Error("Ошибка аутентификации");
-    }
-    if (data.jwt) {
-      localStorage.setItem("jwt", data.jwt);
-      setLoggedIn(true);
-      setEmail(data.email);
-    }
-  }, []);
+  // const authentication = useCallback((data) => {
+  //   if (!data) {
+  //     throw new Error("Ошибка аутентификации");
+  //   }
+  //   if (data.jwt) {
+  //     localStorage.setItem("jwt", data.jwt);
+  //     setLoggedIn(true);
+  //     setEmail(data.email);
+  //   }
+  // }, []);
 
   const handleLogin = useCallback(
-    async (email, password) => {
+    async (info) => {
+      setIsCardsLoading(true);
       try {
-        const data = await auth.authorize(email, password);
-        authentication(data);
-        navigate("/", { replace: true });
+        const data = await auth.authorize(info);
+        if (data.jwt) {
+          //authentication(data);
+          localStorage.setItem("jwt", data.jwt);
+          setLoggedIn(true);
+          setEmail(info.email);
+          navigate("/", { replace: true });
+        }
       } catch (e) {
-        console.log(e);
-        setInfoTooltipOpen("error");
-        setIsInfoTooltipOpen(false);
+        console.error(e);
+        setInfoTooltipStatus(true);
+        setIsInfoTooltipOpen(true);
       } finally {
         setIsCardsLoading(false);
       }
@@ -182,20 +191,22 @@ function App() {
   );
 
   const handleRegistration = useCallback(
-    async (email, password) => {
+    async (info) => {
+      setIsCardsLoading(true);
       try {
-        const data = await auth.register(email, password);
-        authentication(data);
-        setIsInfoTooltipOpen(true);
-        setInfoTooltipOpen("success");
-        navigate("/sign-in", { replace: true });
+        const data = await auth.register(info);
+        if (data) {
+          //authentication(data);
+          setIsInfoTooltipOpen(true);
+          setInfoTooltipStatus(false);
+          navigate("/sign-in", { replace: true });
+        }
       } catch (e) {
-        console.log(e);
-        setInfoTooltipOpen("error");
+        console.error(e);
+        setInfoTooltipStatus(true);
         setIsInfoTooltipOpen(true);
       } finally {
         setIsCardsLoading(false);
-        handleInfoToolOpen();
       }
     },
     [navigate]
@@ -211,7 +222,7 @@ function App() {
         }
         setLoggedIn(true);
         setEmail(user.data.email);
-        navigate("/", { replace: true });
+        navigate("/");
       } catch (e) {
         console.error(e);
       } finally {
@@ -222,16 +233,14 @@ function App() {
     }
   }, [navigate]);
 
-  const handleInfoToolOpen = () => {
-    setInfoTooltipOpen(true);
-  };
-
   const handleLogout = useCallback(() => {
     setLoggedIn(false);
     setEmail("");
     localStorage.removeItem("jwt");
     navigate("/sign-in", { replace: true });
   }, [navigate]);
+
+ 
 
   useEffect(() => {
     handleTokenCheck();
@@ -247,6 +256,7 @@ function App() {
               path="/"
               element={
                 <ProtectedRoute
+                loggedIn={loggedIn}
                   element={Main}
                   cards={cards}
                   onEditProfile={handleEditProfileClick}
@@ -255,8 +265,7 @@ function App() {
                   onCardClick={handleCardClick}
                   onCardLike={handleCardLike}
                   onCardDelete={handleCardDelete}
-                  isLoading={isCardsLoading}
-                  loggedIn={loggedIn}
+                  
                 />
               }
             />
@@ -265,11 +274,10 @@ function App() {
               element={
                 <Register
                   handleRegister={handleRegistration}
-                  handleInfoToolOpen={handleInfoToolOpen}
                 />
               }
             />
-            <Route path="/sign-in" element={<Login onLogin={handleLogin} />} />
+            <Route path="/sign-in" element={<Login onLogin={handleLogin} setInfoTooltipStatus={setInfoTooltipStatus} />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
           <Footer />
@@ -291,12 +299,16 @@ function App() {
             onUpdateAvatar={handleUpdateAvatar}
             onChanging={isEditAvatarChanging}
           />
-          <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+          <ImagePopup
+            card={selectedCard}
+            onClose={closeAllPopups}
+            isOpen={isImagePopupOpen}
+          />
           <Spinner isLoading={isCardsLoading} />
           <InfoTooltip
             onClose={closeAllPopups}
             isOpen={isinfoTooltipOpen}
-            status={infoTooltipOpen}
+            iStatus={infoTooltipStatus}
           />
         </CurrentUserContext.Provider>
       </div>
