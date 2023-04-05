@@ -1,0 +1,9 @@
+.auth__box_link {
+  transition: opacity 0.6 ease-in-out;
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+.auth__box_link:hover {
+  opacity: 0.6;
+}

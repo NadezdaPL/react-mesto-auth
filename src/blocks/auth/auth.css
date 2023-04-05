@@ -1,0 +1,25 @@
+.auth {
+  /* position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0; */
+  width: 100%;
+  /* height: 100%;
+  /* background-color: #000; */
+  /* align-items: center;
+  padding-top: 179px;
+  transition: 0.5s linear;
+  display: flex;
+  flex-direction: column; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 0 80px;
+}
+
+@media screen and (max-width: 568px) {
+  .auth {
+    padding-top: 124px;
+  }
+}
