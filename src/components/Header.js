@@ -1,7 +1,6 @@
 import React from "react";
 import headerLogo from "../images/Mesto.png";
-import { Route, Routes } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Route, Routes, Link } from "react-router-dom";
 
 function Header({ email, onExit }) {
   return (
@@ -30,7 +29,6 @@ function Header({ email, onExit }) {
             }
           />
           <Route
-            exact
             path="/"
             element={
               <div className="header__account">

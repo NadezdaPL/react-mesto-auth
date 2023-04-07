@@ -2,29 +2,17 @@ import React from "react";
 import useForm from "../hooks/useForm";
 import { useEffect } from "react";
 
-
 function Login({ onLogin }) {
   const { values, handleChange, reset } = useForm({});
 
   function handleSubmit(e) {
-    e.preventDefault(); 
-
-    // if (!values.email || !values.password) {
-    //     return;
-    // }
-    onLogin(values)
-
-    // onLogin({
-    //   email: values.email,
-    //   password: values.password,
-    // });
+    e.preventDefault();
+    onLogin(values);
   }
 
   useEffect(() => {
     reset();
   }, [reset]);
-
-
 
   return (
     <section className="auth">

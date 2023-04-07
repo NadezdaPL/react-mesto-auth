@@ -1,0 +1,11 @@
+.header__account {
+  display: flex;
+  align-items: center;
+}
+
+@media screen and (max-width: 568px) {
+  .header__account {
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+}

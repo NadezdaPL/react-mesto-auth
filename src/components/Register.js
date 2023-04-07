@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import useForm from "../hooks/useForm";
 
-function Register({ handleRegister, handleInfoToolOpen }) {
+function Register({ handleRegister }) {
   const { values, handleChange, reset } = useForm();
 
   function handleSubmit(e) {
@@ -53,12 +53,7 @@ function Register({ handleRegister, handleInfoToolOpen }) {
           ></span>
         </div>
       </form>
-      <button
-        type="submit"
-        className="auth__button"
-        onClick={handleInfoToolOpen}
-        form="auth-form"
-      >
+      <button type="submit" className="auth__button" form="auth-form">
         Зарегистрироваться
       </button>
       <div className="auth__box">

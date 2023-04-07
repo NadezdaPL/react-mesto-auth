@@ -10,12 +10,13 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { api } from "../utils/api";
 import * as auth from "../utils/auth";
 import { Spinner } from "./Spinner";
-import { Route, useNavigate, Routes } from "react-router-dom";
+import { Route, useNavigate, Routes, Navigate } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
 import InfoTooltip from "./InfoTooltip";
 import ProtectedRoute from "./ProtectedRoute";
-import { Navigate } from "react-router-dom";
+import success from "../images/success.svg";
+import fail from "../images/fail.svg";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -23,7 +24,7 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
-  const [isinfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
@@ -34,6 +35,7 @@ function App() {
   const [infoTooltipStatus, setInfoTooltipStatus] = useState(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  const [infoText, setInfoText] = useState("");
 
   useEffect(() => {
     loggedIn &&
@@ -50,8 +52,6 @@ function App() {
         });
   }, [loggedIn]);
 
-
-
   const handleEditProfileClick = () => {
     setIsEditProfilePopupOpen(true);
   };
@@ -65,6 +65,7 @@ function App() {
   };
 
   const handleCardClick = (card) => {
+    setIsImagePopupOpen(true);
     setSelectedCard(card);
   };
 
@@ -156,33 +157,22 @@ function App() {
     setIsInfoTooltipOpen(false);
   };
 
-  // const authentication = useCallback((data) => {
-  //   if (!data) {
-  //     throw new Error("Ошибка аутентификации");
-  //   }
-  //   if (data.jwt) {
-  //     localStorage.setItem("jwt", data.jwt);
-  //     setLoggedIn(true);
-  //     setEmail(data.email);
-  //   }
-  // }, []);
-
   const handleLogin = useCallback(
     async (info) => {
       setIsCardsLoading(true);
       try {
         const data = await auth.authorize(info);
-        if (data.jwt) {
-          //authentication(data);
-          localStorage.setItem("jwt", data.jwt);
+        if (data.token) {
+          localStorage.setItem("token", data.token);
           setLoggedIn(true);
           setEmail(info.email);
           navigate("/", { replace: true });
         }
       } catch (e) {
         console.error(e);
-        setInfoTooltipStatus(true);
         setIsInfoTooltipOpen(true);
+        setInfoTooltipStatus(false);
+        setInfoText("Что-то пошло не так! Попробуйте ещё раз.");
       } finally {
         setIsCardsLoading(false);
       }
@@ -196,15 +186,16 @@ function App() {
       try {
         const data = await auth.register(info);
         if (data) {
-          //authentication(data);
           setIsInfoTooltipOpen(true);
-          setInfoTooltipStatus(false);
+          setInfoTooltipStatus(true);
+          setInfoText("Вы успешно зарегистрировались!");
           navigate("/sign-in", { replace: true });
         }
       } catch (e) {
         console.error(e);
-        setInfoTooltipStatus(true);
+        setInfoTooltipStatus(false);
         setIsInfoTooltipOpen(true);
+        setInfoText("Что-то пошло не так! Попробуйте ещё раз.");
       } finally {
         setIsCardsLoading(false);
       }
@@ -213,10 +204,10 @@ function App() {
   );
 
   const handleTokenCheck = useCallback(async () => {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
+    const token = localStorage.getItem("token");
+    if (token) {
       try {
-        const user = await auth.checkToken(jwt);
+        const user = await auth.checkToken(token);
         if (!user) {
           throw new Error("Данные отсутствуют");
         }
@@ -236,15 +227,13 @@ function App() {
   const handleLogout = useCallback(() => {
     setLoggedIn(false);
     setEmail("");
-    localStorage.removeItem("jwt");
+    localStorage.removeItem("token");
     navigate("/sign-in", { replace: true });
   }, [navigate]);
 
- 
-
   useEffect(() => {
     handleTokenCheck();
-  }, []);
+  }, [handleTokenCheck]);
 
   return (
     <div className="App">
@@ -256,7 +245,7 @@ function App() {
               path="/"
               element={
                 <ProtectedRoute
-                loggedIn={loggedIn}
+                  loggedIn={loggedIn}
                   element={Main}
                   cards={cards}
                   onEditProfile={handleEditProfileClick}
@@ -265,20 +254,20 @@ function App() {
                   onCardClick={handleCardClick}
                   onCardLike={handleCardLike}
                   onCardDelete={handleCardDelete}
-                  
                 />
               }
             />
             <Route
               path="/sign-up"
+              element={<Register handleRegister={handleRegistration} />}
+            />
+            <Route path="/sign-in" element={<Login onLogin={handleLogin} />} />
+            <Route
+              path="*"
               element={
-                <Register
-                  handleRegister={handleRegistration}
-                />
+                loggedIn ? <Navigate to="/" /> : <Navigate to="/sign-in" />
               }
             />
-            <Route path="/sign-in" element={<Login onLogin={handleLogin} setInfoTooltipStatus={setInfoTooltipStatus} />} />
-            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
           <Footer />
           <EditProfilePopup
@@ -307,8 +296,9 @@ function App() {
           <Spinner isLoading={isCardsLoading} />
           <InfoTooltip
             onClose={closeAllPopups}
-            isOpen={isinfoTooltipOpen}
-            iStatus={infoTooltipStatus}
+            isOpen={isInfoTooltipOpen}
+            title={infoText}
+            image={infoTooltipStatus ? success : fail}
           />
         </CurrentUserContext.Provider>
       </div>

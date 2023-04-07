@@ -1,19 +1,17 @@
 import React from "react";
-import success from "../images/success.svg";
-import fail from "../images/fail.svg";
 
-function InfoTooltip({ isOpen, onClose, isStatus }) {
+function InfoTooltip({ isOpen, onClose, image, title }) {
   return (
-    <section className={`popup popup__infoToolTip ${isOpen ? "popup_opened" : ""}`}>
-      <div className="popup__container">
-        <button className="popup__close" onClick={onClose} type="button"></button>
-        <img className="popup__item" src={isStatus ? fail : success} alt={""} />
-        <h2 className="popup__text">
-          {isStatus
-            ? "Что-то пошло не так! Попробуйте ещё раз."
-            : "Вы успешно зарегистрировались!"}
-        </h2>
-      </div>
+    <section className={`popup popup__infoTooltip ${isOpen ? "popup_opened" : ""}`}>
+      <form className="popup__container">
+        <button
+          className="popup__close"
+          onClick={onClose}
+          type="button"
+        ></button>
+        <img className="popup__item" src={image} alt={title} />
+        <h2 className="popup__text">{title}</h2>
+      </form>
     </section>
   );
 }
