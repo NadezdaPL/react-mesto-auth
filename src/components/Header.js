@@ -1,8 +1,10 @@
 import React from "react";
 import headerLogo from "../images/Mesto.png";
-import { Route, Routes, Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-function Header({ email, onExit }) {
+function Header({ email, onExit, loggedIn }) {
+  const location = useLocation();
+
   return (
     <header className="header page__header">
       <div className="header__container">
@@ -11,35 +13,25 @@ function Header({ email, onExit }) {
           className="header__logo"
           alt="Логотип Место Россия"
         />
-        <Routes>
-          <Route
-            path="/sign-in"
-            element={
-              <Link className="header__link" to="/sign-up">
-                Регистрация
-              </Link>
-            }
-          />
-          <Route
-            path="/sign-up"
-            element={
-              <Link className="header__link" to="/sign-in">
-                Войти
-              </Link>
-            }
-          />
-          <Route
-            path="/"
-            element={
-              <div className="header__account">
-                <p className="header__email">{email}</p>
-                <Link className="header__exit" to="/sign-in" onClick={onExit}>
-                  Выйти
-                </Link>
-              </div>
-            }
-          />
-        </Routes>
+        {location.pathname === "/sign-in" && (
+          <Link className="header__link" to="/sign-up">
+            Регистрация
+          </Link>
+        )}
+
+        {location.pathname === "/sign-up" && (
+          <Link className="header__link" to="/sign-in">
+            Войти
+          </Link>
+        )}
+        {loggedIn && (
+          <div className="header__account">
+            <p className="header__email">{email}</p>
+            <button className="header__exit" onClick={onExit}>
+              Выйти
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );
